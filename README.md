@@ -34,3 +34,9 @@ TEXET will go through the entire input and remove a user-specified character:
 TEXET will format each word/character into an array that can be directly copied to Python:
 
 <img width="409" alt="Screenshot 2024-05-21 at 10 40 29 AM" src="https://github.com/aschwalbe/texet/assets/72226126/b4140d7d-2504-4e89-992f-4d8964463abb">
+
+## Feedback
+
+If you run into any issues or want to request a new feature, feel free to add an issue to the "Issues" tab.
+
+If you discover something while using the application, type "98" into the options menu to access a Google Form where you can leave direct feedback.
