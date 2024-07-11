@@ -1,18 +1,18 @@
 ########################################
 #
 #  Name: Austin Schwalbe
-#  Last updated: May 17, 2024
+#  Last updated: July 11, 2024
 #  Description: Automatically turns a phrase into a list of words
 #
 ########################################
-import webbrowser
+import webbrowser, sys
 
 ### class for user input
-class userin:
-    words = ""
-    option = ""
-    suboption = ""
-    suboption2 = ""
+class system:
+    com_all = ['-h', '--help', '-i', '--input', '-r', '--remove', '-d', '--divide']
+    com = ""    # entire command
+    inp = ""    # inputted text
+    orig = ""   # original text
     
 ### class of colors
 class colors:
@@ -25,15 +25,14 @@ class colors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-### function for getting input
-def getInput(prompt):
+### function for printing input text
+def printInput(inp):
 
-    # print prompt
-    print(colors.OKBLUE + prompt + colors.ENDC)
-
-    # get user input
-    getinput = input("> ")
-    return getinput
+    # print header
+    print(colors.BOLD + "\n<< INPUT >>" + colors.ENDC)
+	
+    # print input text
+    print(inp)
 
 ### function for printing output line
 def printOutput(output):
@@ -45,16 +44,36 @@ def printOutput(output):
 	print(output)
     
 ### function for responding to invalid input
-def invalidInput():
-	print("That is not a valid option...")
-	exit(1)
+def invalidInput(error_msg):
+    print(colors.FAIL + f"\n{error_msg}" + colors.ENDC)
+    exit(0)
 
-### function for checking suboption input
-def checkSuboption(sub):
-    if sub in ["w", "word"]: return "w"
-    elif sub in ["c", "char", "character"]: return "c"
-    elif sub in ["1", "2", "3"]: return sub
-    else: invalidInput()
+### function for printing help menu
+def printHelp():
+    print("Texet 2.0 (by Austin Schwalbe)")
+    print("Usage: python3 texet.py -i 'target text' {options}")
+    
+    print("\nGENERAL")
+    print("=======")
+    print("-h, --help: Print this list")
+    print("-i, --input: Specify the text that will be manipulated")
+    
+    print("\nOPTIONS")
+    print("=======")
+    print("-c, --case: Change the text case to [u]ppercase, [l]owercase, or [t]itlecase")
+    print("-d, --divide: Divide text into a list by [w]ord or [c]haracter")
+    print("-r, --remove: Remove a specified character from the text")
+    print("-a, --array: Convert text to a Python array by [w]ord or [c]haracter")
+    print("NOTE: Options will be applied in the order you enter them")
+    
+    print("\nEXAMPLE")
+    print("=======")
+    print("python3 texet.py -i 'Welcome to texet!' -c l -r e -a w")
+    print("Result: ['wlcom', 'to', 'txt!']")
+
+######
+######      FUNCTIONS FOR TEXT MANIPULATION
+######
 
 ### function for printing list
 def printList(inp, opt):
@@ -76,44 +95,28 @@ def printList(inp, opt):
     		char = inp[i]
     		if i == len(inp)-1: output += f"{char}"
     		else: output += f"{char}\n"
-    	printOutput(output)
+    	return output
     
     # otherwise, let the user know the input is invalid
-    else: invalidInput()
-
-### function for printing text between words
-def printTextAdd(inp, opt, add):
+    else: invalidInput("Please enter 'w' or 'c' to split by words or characters")
     
-    # print output for words
-    if opt == "w":
-    	output = inp.replace(" ", f"{add}")
-    	printOutput(output)
-    
-    # print output for characters
-    elif opt == "c":
-    	 
-    	 output = ""
-    	 
-    	 # iterate through input
-    	 for i in range(len(inp)):
-    	 	if i == len(inp)-1: output += inp[i]
-    	 	else: output += f"{inp[i]}{add}"
-    	 printOutput(output)
-
 ### function for changing text case
 def printCase(inp, opt):
 	
 	# print UPPERCASE
-	if opt == "1": printOutput(inp.upper())
+	if opt == "u": inp = inp.upper()
 	
 	# print lowercase
-	elif opt == "2": printOutput(inp.lower())
+	elif opt == "l": inp = inp.lower()
 	
 	# print Title Case
-	elif opt == "3": printOutput(inp.title())
+	elif opt == "t": inp = inp.title()
 	
 	# otherwise, let the user know the input is invalid
-	else: invalidInput()
+	else: invalidInput("Please enter 'u', 'l', or 't' to convert to UPPER CASE, lower case, or Title Case")
+
+	# return the result
+	return inp
 
 ### function for removing characters
 def removeChar(inp, char):
@@ -125,28 +128,118 @@ def removeChar(inp, char):
 		if c != char: output += c
 	
 	# print output
-	printOutput(output)
+	return output
 
 ### function for printing arrays
 def printArray(inp, opt):
 
     # print word output
     if opt == ("w"):
-        code_array = userin.words.split()
-        printOutput(code_array)
+        code_array = inp.split()
+        return code_array
     
     # print character output
     elif opt == ("c"):
         code_array = [char for char in inp]
-        printOutput(code_array)
+        return code_array
             
     # otherwise, let the user know the input is invalid
-    else: invalidInput()
+    else: invalidInput("Please enter 'w' or 'c' to split by words or characters")
 
 ###################################################################
 #########################   DRIVER CODE   #########################
 ###################################################################
+
+# ----- interate through list and find options ----- #
+# run this process for each individual command to prevent duplicates
+
+# get input from command line
+system.com = sys.argv[1:]
+
+# check for help first
+for opt in system.com:
+
+    # check for help
+    if opt in ["-h", "--help"]:
+        printHelp()
+        exit(0)
+
+# get input text from command line
+for opt in system.com:
+
+    if opt in ['-i', '--input']:
+        loc = system.com.index(opt)
+        try: system.inp = system.com[loc+1]
+        except IndexError:
+            print("Usage: python3 texet.py -i 'target text' {options}")
+            exit(0)
+        system.orig = system.inp
+        if system.inp == "":
+            print("Usage: python3 texet.py -i 'target text' {options}")
+            exit(0)
+        else: break
+    else:
+        print("Usage: python3 texet.py -i 'target text' {options}")
+        exit(0)
+
+# check for case
+for opt in system.com:
+
+    if opt in ["-c", "--case"]:
+        
+        loc = system.com.index(opt)
+        try: param = system.com[loc+1]
+        except IndexError:
+            invalidInput("Please enter 'u', 'l', or 't' to convert to UPPER CASE, lower case, or Title Case")
+            
+        if param in ['u', 'l', 't']: system.inp = printCase(system.inp, param)
+
+# check for divide
+for opt in system.com:
     
+    if opt in ["-d", "--divide"]:
+        
+        loc = system.com.index(opt)
+        try: param = system.com[loc+1]
+        except IndexError:
+            invalidInput("Please enter 'w' or 'c' to split by words or characters")
+            
+        if param in ['w', 'c']: system.inp = printList(system.inp, param)
+
+
+# check for remove
+for opt in system.com:
+    
+    if opt in ["-r", "--remove"]:
+        
+        loc = system.com.index(opt)
+        try: param = system.com[loc+1]
+        except IndexError:
+            invalidInput("Please enter a single character to remove")
+            
+        if (param not in system.com_all and len(param) == 1): system.inp = removeChar(system.inp, param)
+        else: invalidInput("Please enter a single character to remove")
+
+# check for array
+for opt in system.com:
+    
+    if opt in ["-a", "--array"]:
+        
+        loc = system.com.index(opt)
+        try: param = system.com[loc+1]
+        except IndexError:
+            invalidInput("Please enter 'w' or 'c' to split by words or characters")
+            
+        if param in ['w', 'c']: system.inp = printArray(system.inp, param)
+
+# check if options were entered
+if system.inp == system.orig:
+    print("Usage: python3 texet.py -i 'target text' {options}")
+    exit(0)
+
+# ----- print the results ----- #
+# this should only run if the command was successful are there were no errors
+
 # print header
 print("\n    <><><><><><><><><><>" + colors.HEADER)
 print(" ___   ___  _____  ___   ___")
@@ -155,60 +248,10 @@ print(" |_|  |__\  /_/_\  /__|  |_|")
 print(colors.ENDC)
 print("    <><><><><><><><><><>")
 print(colors.OKGREEN)
-print("   Austin Schwalbe • V1.0\n\n" + colors.ENDC)
+print("   Austin Schwalbe • V2.0\n" + colors.ENDC)
 
-# prompt user for input
-userin.words = getInput("Enter the text you want to process:")
-print("")
-userin.option = getInput("What would you like to do?\n" + 
-                         "1. Make a list\n" + 
-                         "2. Insert text\n" +
-                         "3. Change case\n" +
-                         "4. Remove character\n" +
-                         "5. Generate Python array\n" +
-                         "98. Leave feedback\n" +
-                         "99. Exit program")
+# print the input
+printInput(system.orig)
 
-# select option based on input
-# if "1", turn the input into a list divided by newlines
-if userin.option == "1":
-    userin.suboption = getInput("\nChoose whether to divide by [w]ord or [c]haracter:")
-    userin.suboption = checkSuboption(userin.suboption)
-    printList(userin.words, userin.suboption)
-
-# if "2", add some text between each character or word in the input
-elif userin.option == "2":
-    userin.suboption = getInput(
-    					"\nChoose whether to add text between each [w]ord or [c]haracter:")
-    userin.suboption = checkSuboption(userin.suboption)
-    userin.suboption2 = getInput("\nEnter the text you want to add:")
-    printTextAdd(userin.words, userin.suboption, userin.suboption2)
-
-# if "3", change case
-elif userin.option == "3":
-	userin.suboption = getInput("\nChoose how to apply case:\n" + 
-    					"1. UPPERCASE\n" + 
-    					"2. lowercase\n" +
-    					"3. Title Case")
-	userin.suboption = checkSuboption(userin.suboption)
-	printCase(userin.words, userin.suboption)
-
-# if "4", remove an inputted character
-elif userin.option == "4":
-	userin.suboption = getInput("\nType character you want to remove:")
-	removeChar(userin.words, userin.suboption)
-
-# if "5", turn text into a code array
-elif userin.option == "5":
-    userin.suboption = getInput("\nChoose whether to divide by [w]ord or [c]haracter:")
-    userin.suboption = checkSuboption(userin.suboption)
-    printArray(userin.words, userin.suboption)
-
-# if "98", take users to a Google Form to enter feedback
-elif userin.option == "98": webbrowser.open("https://forms.gle/Rv4cfGTRC17ek7YP7", new = 2, autoraise = True)
-
-# if "99", exit the program
-elif userin.option == "99": exit(0)
-
-# if all else fails, exit the program
-else: invalidInput()
+# finally, print the result
+printOutput(system.inp)
