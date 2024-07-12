@@ -1,7 +1,7 @@
 ########################################
 #
 #  Name: Austin Schwalbe
-#  Last updated: July 11, 2024
+#  Last updated: July 12, 2024
 #  Description: Automatically turns a phrase into a list of words
 #
 ########################################
@@ -9,7 +9,7 @@ import webbrowser, sys
 
 ### class for user input
 class system:
-    com_all = ['-h', '--help', '-i', '--input', '-r', '--remove', '-d', '--divide']
+    com_all = ['-h', '--help', '-i', '--input', '-r', '--remove', '-d', '--divide', '-c', '--case']
     com = ""    # entire command
     inp = ""    # inputted text
     orig = ""   # original text
@@ -86,7 +86,7 @@ def printList(inp, opt):
     		word = words[i]
     		if i == len(words)-1: output += f"{word}"
     		else: output += f"{word}\n"
-    	printOutput(output)
+    	return output
     
     # print character output
     elif opt == ("c"):
@@ -156,7 +156,12 @@ def printArray(inp, opt):
 # get input from command line
 system.com = sys.argv[1:]
 
-# check for help first
+# check for invalid flags
+for opt in system.com:
+
+	if (opt not in system.com_all and len(opt) == 2 and opt[0] == '-'): invalidInput("Please enter valid options")
+
+# then check for help
 for opt in system.com:
 
     # check for help
